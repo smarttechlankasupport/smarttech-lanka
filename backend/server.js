@@ -59,16 +59,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // ── API Routes ────────────────────────────────
-const authRouter = require('./routes/auth');
-app.use('/api/auth',       authRouter);
-
-// Alias: allow POST /api/auth/signup to map to existing /api/auth/register
-app.post('/api/auth/signup', (req, res, next) => {
-  try {
-    req.url = req.url.replace('/signup', '/register');
-  } catch (e) {}
-  return authRouter(req, res, next);
-});
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products',   require('./routes/products'));
 app.use('/api/categories', require('./routes/categories'));
 app.use('/api/orders',     require('./routes/orders'));
