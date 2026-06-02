@@ -1,0 +1,189 @@
+/* ============================================
+   frontend/styles/globals.css
+   Purpose: Global styles + Tailwind imports
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base ─────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-dark text-gray-100 font-inter antialiased;
+    background-color: #070707;
+    min-height: 100vh;
+  }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #090909; }
+  ::-webkit-scrollbar-thumb { @apply bg-gray-700 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-gray-600; }
+  ::selection { background: rgba(255,255,255,0.18); color: #ffffff; }
+  input, textarea, select { @apply outline-none; }
+}
+
+/* ── Components ───────────────────────────── */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-semibold
+           text-white bg-black border border-white/10 shadow-soft
+           transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-card;
+  }
+  .btn-primary:hover { @apply bg-gray-900; }
+  .btn-primary:disabled { @apply opacity-50 cursor-not-allowed transform-none; }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-semibold
+           bg-white text-black border border-black/10 shadow-sm
+           transition-all duration-300 hover:bg-gray-100;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-semibold
+           bg-transparent text-gray-200 border border-white/10
+           transition-all duration-300 cursor-pointer;
+  }
+  .btn-outline:hover { @apply bg-white/10; }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-2xl font-semibold
+           bg-white/5 text-gray-200 border border-white/10 transition-all duration-200;
+  }
+  .btn-danger:hover { @apply bg-white/10; }
+
+  .btn-success {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-2xl font-semibold
+           bg-white/5 text-gray-200 border border-white/10 transition-all duration-200;
+  }
+  .btn-success:hover { @apply bg-white/10; }
+
+  .btn-whatsapp {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-semibold text-white
+           bg-white/10 border border-white/10 transition-all duration-300;
+  }
+  .btn-whatsapp:hover { @apply bg-white/15 shadow-card; }
+
+  .card {
+    @apply bg-dark-card border border-white/10 rounded-[28px] backdrop-blur-sm
+           transition-all duration-300;
+  }
+  .card:hover { @apply border-white/15 shadow-soft; }
+
+  .glass {
+    background: rgba(255,255,255,0.05);
+    @apply backdrop-blur-md border border-white/10 rounded-[28px];
+  }
+
+  .input {
+    @apply w-full bg-black/70 border border-white/10 rounded-2xl px-5 py-4
+           text-gray-100 text-sm placeholder-gray-500 font-inter
+           transition-all duration-200;
+  }
+  .input:focus { @apply border-white/20 ring-2 ring-white/10; }
+  .input-label { @apply block text-xs text-gray-400 mb-2 font-medium uppercase tracking-[0.24em]; }
+
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[0.22em]
+           text-gray-200 bg-white/5 border border-white/10;
+  }
+  .badge-green,
+  .badge-red,
+  .badge-yellow,
+  .badge-pending,
+  .badge-confirmed,
+  .badge-processing,
+  .badge-shipped,
+  .badge-delivered,
+  .badge-cancelled,
+  .badge-completed {
+    @apply badge;
+  }
+
+  .nav-link {
+    @apply text-gray-400 hover:text-white text-sm font-medium transition-colors duration-200 relative;
+  }
+  .nav-link.active { @apply text-white bg-white/10; }
+
+  .admin-nav-item {
+    @apply flex items-center gap-3 px-3 py-3 rounded-2xl text-sm font-medium
+           text-gray-300 transition-all duration-200 cursor-pointer;
+  }
+  .admin-nav-item:hover { @apply bg-white/5 text-white; }
+  .admin-nav-item.active {
+    @apply bg-white/10 text-white border border-white/10;
+  }
+
+  .stat-card {
+    @apply glass p-6 rounded-[28px] transition-all duration-300;
+  }
+  .stat-card:hover { @apply border-white/15 shadow-card; }
+
+  .section-title {
+    @apply font-semibold text-white mb-3;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+  }
+
+  .glow-text {
+    color: #f8f8f8;
+    text-shadow: 0 0 20px rgba(255,255,255,0.08), 0 0 40px rgba(255,255,255,0.04);
+  }
+
+  .data-table { @apply w-full; }
+  .data-table th {
+    @apply px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.2em]
+           text-gray-500 border-b border-white/10;
+  }
+  .data-table td { @apply px-4 py-4 text-sm text-gray-300 border-b border-white/10; }
+  .data-table tr:hover td { background: rgba(255,255,255,0.04); }
+
+  .page-container { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+
+  .glow-blob {
+    @apply absolute rounded-full opacity-10 pointer-events-none;
+    filter: blur(90px);
+  }
+
+  .circuit-bg {
+    background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .spinner {
+    @apply border-2 border-white/10 border-t-white/70 rounded-full animate-spin;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #ffffff, #d9d9d9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .bg-dark-gradient {
+    background: linear-gradient(135deg, #070707 0%, #111111 50%, #070707 100%);
+  }
+  .border-glow { border-color: rgba(255,255,255,0.08); box-shadow: 0 0 15px rgba(255,255,255,0.05); }
+  .hover-lift { @apply transition-transform duration-300 hover:-translate-y-1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #0b0b0b 25%, #141414 50%, #0b0b0b 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.swiper-pagination-bullet { background: rgba(255,255,255,0.1) !important; }
+.swiper-pagination-bullet-active { background: #f8f8f8 !important; }
+
+.toast-custom {
+  background: #111111 !important;
+  color: #f8f8f8 !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+}
