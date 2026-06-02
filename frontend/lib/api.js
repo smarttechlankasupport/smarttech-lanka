@@ -5,11 +5,18 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const FALLBACK_BASE_URL = typeof window !== 'undefined'
-  ? `${window.location.protocol}//${window.location.hostname}:5000/api`
-  : 'http://localhost:5000/api';
+// Production API URL (always available)
+const PRODUCTION_API_URL = 'https://smarttech-lanka.onrender.com/api';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || FALLBACK_BASE_URL;
+// Development fallback (localhost)
+const DEV_FALLBACK_URL = 'http://localhost:5000/api';
+
+// Determine base URL:
+// 1. Use env var if set (recommended for production)
+// 2. Use production URL as fallback in production
+// 3. Use localhost fallback in development
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL 
+  || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? PRODUCTION_API_URL : DEV_FALLBACK_URL);
 
 // ── Axios instance ────────────────────────────
 const api = axios.create({
