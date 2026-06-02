@@ -26,35 +26,48 @@ const sendToken = (user, statusCode, res) => {
 };
 
 // POST /api/auth/register
-router.post('/register', asyncH(async (req, res) => {
+router.post('/register', async (req, res) => {
   console.log('REGISTER ROUTE HIT');
   const { name, email, password, phone } = req.body;
   if (!name || !email || !password) {
-    res.status(400); throw new Error('Please provide name, email and password');
+    res.status(400);
+    throw new Error('Please provide name, email and password');
   }
   const exists = await User.findOne({ email });
-  if (exists) { res.status(400); throw new Error('Email already registered'); }
+  if (exists) {
+    res.status(400);
+    throw new Error('Email already registered');
+  }
 
   const user = await User.create({ name, email, password, phone });
   sendToken(user, 201, res);
-}));
+});
 
 // POST /api/auth/login
-router.post('/login', asyncH(async (req, res) => {
+router.post('/login', async (req, res) => {
   console.log('LOGIN ROUTE HIT');
   const { email, password } = req.body;
-  if (!email || !password) { res.status(400); throw new Error('Provide email and password'); }
+  if (!email || !password) {
+    res.status(400);
+    throw new Error('Provide email and password');
+  }
 
   const user = await User.findOne({ email }).select('+password');
-  if (!user) { res.status(401); throw new Error('Invalid email or password'); }
+  if (!user) {
+    res.status(401);
+    throw new Error('Invalid email or password');
+  }
 
   const isMatch = await user.matchPassword(password);
-  if (!isMatch) { res.status(401); throw new Error('Invalid email or password'); }
+  if (!isMatch) {
+    res.status(401);
+    throw new Error('Invalid email or password');
+  }
 
   user.lastLogin = new Date();
   await user.save({ validateBeforeSave: false });
   sendToken(user, 200, res);
-}));
+});
 
 // POST /api/auth/forgot-password
 router.post('/forgot-password', asyncH(async (req, res) => {
