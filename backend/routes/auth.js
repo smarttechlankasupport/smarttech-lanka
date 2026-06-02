@@ -2,14 +2,15 @@
 // Auth Routes — Register / Login / Profile
 // ============================================
 const crypto    = require('crypto');
-const express   = require('express');
 const asyncH    = require('express-async-handler');
 const bcrypt    = require('bcryptjs');
 const User      = require('../models/User');
 const sendEmail = require('../utils/email');
 const { protect } = require('../middleware/auth');
 
-const router = express.Router();
+const router = require('express').Router();
+console.log('Auth router initialized');
+console.log('AUTH FILE LOADED');
 
 const sendToken = (user, statusCode, res) => {
   const token = user.getJWTToken();
@@ -26,6 +27,7 @@ const sendToken = (user, statusCode, res) => {
 
 // POST /api/auth/register
 router.post('/register', asyncH(async (req, res) => {
+  console.log('REGISTER ROUTE HIT');
   const { name, email, password, phone } = req.body;
   if (!name || !email || !password) {
     res.status(400); throw new Error('Please provide name, email and password');
@@ -39,6 +41,7 @@ router.post('/register', asyncH(async (req, res) => {
 
 // POST /api/auth/login
 router.post('/login', asyncH(async (req, res) => {
+  console.log('LOGIN ROUTE HIT');
   const { email, password } = req.body;
   if (!email || !password) { res.status(400); throw new Error('Provide email and password'); }
 

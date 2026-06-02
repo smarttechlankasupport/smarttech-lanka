@@ -58,8 +58,13 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// Startup log to confirm server reaches route-loading phase
+console.log('SERVER STARTED - LOADING ROUTES');
+
 // ── API Routes ────────────────────────────────
-app.use('/api/auth', require('./routes/auth'));
+const authRouter = require('./routes/auth');
+app.use('/api/auth', authRouter);
+console.log('Auth routes loaded');
 app.use('/api/products',   require('./routes/products'));
 app.use('/api/categories', require('./routes/categories'));
 app.use('/api/orders',     require('./routes/orders'));
