@@ -208,4 +208,13 @@ router.post('/wishlist/:productId', protect, asyncH(async (req, res) => {
   res.json({ success: true, action, wishlist: user.wishlist });
 }));
 
+// ── TEST ROUTES (temporary, for deployment verification)
+router.get('/login-test', (req, res) => {
+  res.json({ success: true, message: 'login route loaded' });
+});
+
+router.get('/register-test', (req, res) => {
+  res.json({ success: true, message: 'register route loaded' });
+});
+
 module.exports = router;
