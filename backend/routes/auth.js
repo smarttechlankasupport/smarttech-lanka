@@ -3,7 +3,6 @@
 // ============================================
 const crypto    = require('crypto');
 const asyncH    = require('express-async-handler');
-const bcrypt    = require('bcryptjs');
 const User      = require('../models/User');
 const sendEmail = require('../utils/email');
 const { protect } = require('../middleware/auth');
@@ -26,53 +25,58 @@ const sendToken = (user, statusCode, res) => {
 };
 
 // POST /api/auth/register
-router.post('/register', async (req, res) => {
+router.post('/register', asyncH(async (req, res) => {
   console.log('REGISTER ROUTE HIT');
   const { name, email, password, phone } = req.body;
   if (!name || !email || !password) {
-    res.status(400);
-    throw new Error('Please provide name, email and password');
+    const err = new Error('Please provide name, email and password');
+    err.statusCode = 400;
+    throw err;
   }
   const exists = await User.findOne({ email });
   if (exists) {
-    res.status(400);
-    throw new Error('Email already registered');
+    const err = new Error('Email already registered');
+    err.statusCode = 400;
+    throw err;
   }
 
   const user = await User.create({ name, email, password, phone });
   sendToken(user, 201, res);
-});
+}));
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', asyncH(async (req, res) => {
   console.log('LOGIN ROUTE HIT');
   const { email, password } = req.body;
   if (!email || !password) {
-    res.status(400);
-    throw new Error('Provide email and password');
+    const err = new Error('Provide email and password');
+    err.statusCode = 400;
+    throw err;
   }
 
   const user = await User.findOne({ email }).select('+password');
   if (!user) {
-    res.status(401);
-    throw new Error('Invalid email or password');
+    const err = new Error('Invalid email or password');
+    err.statusCode = 401;
+    throw err;
   }
 
   const isMatch = await user.matchPassword(password);
   if (!isMatch) {
-    res.status(401);
-    throw new Error('Invalid email or password');
+    const err = new Error('Invalid email or password');
+    err.statusCode = 401;
+    throw err;
   }
 
   user.lastLogin = new Date();
   await user.save({ validateBeforeSave: false });
   sendToken(user, 200, res);
-});
+}));
 
 // POST /api/auth/forgot-password
 router.post('/forgot-password', asyncH(async (req, res) => {
   const { email } = req.body;
-  if (!email) { res.status(400); throw new Error('Please provide your email address'); }
+  if (!email) { const err = new Error('Please provide your email address'); err.statusCode = 400; throw err; }
 
   const user = await User.findOne({ email: email.toLowerCase() });
   if (!user) {
@@ -125,8 +129,8 @@ router.post('/forgot-password', asyncH(async (req, res) => {
 // POST /api/auth/reset-password
 router.post('/reset-password', asyncH(async (req, res) => {
   const { token, password } = req.body;
-  if (!token || !password) { res.status(400); throw new Error('Token and new password are required'); }
-  if (password.length < 6) { res.status(400); throw new Error('Password must be at least 6 characters'); }
+  if (!token || !password) { const err = new Error('Token and new password are required'); err.statusCode = 400; throw err; }
+  if (password.length < 6) { const err = new Error('Password must be at least 6 characters'); err.statusCode = 400; throw err; }
 
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
   const user = await User.findOne({
@@ -134,7 +138,7 @@ router.post('/reset-password', asyncH(async (req, res) => {
     resetPasswordExpire: { $gt: Date.now() },
   }).select('+password');
 
-  if (!user) { res.status(400); throw new Error('Reset token is invalid or has expired'); }
+  if (!user) { const err = new Error('Reset token is invalid or has expired'); err.statusCode = 400; throw err; }
 
   user.password = password;
   user.resetPasswordToken = undefined;
@@ -166,7 +170,7 @@ router.put('/change-password', protect, asyncH(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   const user = await User.findById(req.user._id).select('+password');
   const isMatch = await user.matchPassword(currentPassword);
-  if (!isMatch) { res.status(400); throw new Error('Current password is incorrect'); }
+  if (!isMatch) { const err = new Error('Current password is incorrect'); err.statusCode = 400; throw err; }
   user.password = newPassword;
   await user.save();
   sendToken(user, 200, res);

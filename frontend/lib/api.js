@@ -15,8 +15,10 @@ const DEV_FALLBACK_URL = 'http://localhost:5000/api';
 // 1. Use env var if set (recommended for production)
 // 2. Use production URL as fallback in production
 // 3. Use localhost fallback in development
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL 
+const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL 
   || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? PRODUCTION_API_URL : DEV_FALLBACK_URL);
+const normalizedBaseUrl = rawBaseUrl.replace(/\/+$/, '');
+const BASE_URL = normalizedBaseUrl.endsWith('/api') ? normalizedBaseUrl : `${normalizedBaseUrl}/api`;
 
 // ── Axios instance ────────────────────────────
 const api = axios.create({

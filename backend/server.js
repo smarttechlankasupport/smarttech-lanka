@@ -1,16 +1,14 @@
 // ============================================
 // Smart  Tech - Main Express Server
 // ============================================
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
-
-// Connect to MongoDB
-connectDB();
 
 const app = express();
 
@@ -106,20 +104,31 @@ app.use((err, req, res, next) => {
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({ success: false, message: 'Invalid token' });
   }
-  res.status(err.statusCode || 500).json({
+  const statusCode = err.statusCode || (res.statusCode !== 200 ? res.statusCode : 500);
+  res.status(statusCode).json({
     success: false,
     message: err.message || 'Internal Server Error',
   });
 });
 
 const PORT = parseInt(process.env.PORT, 10) || 5000;
+let server;
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
-});
+const startServer = async () => {
+  await connectDB();
 
-server.on('error', (err) => {
-  console.error('Server error:', err.message);
+  server = app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
+  });
+
+  server.on('error', (err) => {
+    console.error('Server error:', err.message);
+    process.exit(1);
+  });
+};
+
+startServer().catch((err) => {
+  console.error('Failed to start server:', err.message);
   process.exit(1);
 });
 
