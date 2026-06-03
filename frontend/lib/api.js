@@ -71,13 +71,14 @@ const handleErr = (err) => {
     throw new Error(`Network Error. Ensure the backend is running and reachable at ${BASE_URL}`);
   }
 
-  const apiMessage = err.response?.data?.message;
+  const apiMessage = err.response?.data?.message || err.response?.statusText;
   const statusCode = err.response?.status;
   const debugMessage = apiMessage || err.message || 'Something went wrong';
 
   const error = new Error(debugMessage);
   error.statusCode = statusCode;
   error.apiMessage = apiMessage;
+  error.response = err.response;
   throw error;
 };
 

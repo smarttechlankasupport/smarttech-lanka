@@ -18,7 +18,9 @@ export default function ForgotPasswordPage() {
       toast.success(res.data.message || 'Reset link sent if the email exists.');
       setEmail('');
     } catch (err) {
-      toast.error(err.message);
+      console.error('[forgot-password] request failed', err);
+      const message = err?.response?.data?.message || err?.message || 'Network error. Please try again.';
+      toast.error(message);
     } finally {
       setSending(false);
     }
