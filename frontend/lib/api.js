@@ -6,7 +6,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 // Production API URL (always available)
-const PRODUCTION_API_URL = 'https://smarttech-lanka.onrender.com/api';
+const PRODUCTION_API_URL = 'https://smarttech-lanka-api.onrender.com/api';
 
 // Development fallback (localhost)
 const DEV_FALLBACK_URL = 'http://localhost:5000/api';

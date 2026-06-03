@@ -13,7 +13,7 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     if (!email.trim()) { toast.error('Enter your email address'); return; }
     setSending(true);
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.trim() || BASE_URL || 'https://smarttech-lanka.onrender.com/api';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.trim() || BASE_URL || 'https://smarttech-lanka-api.onrender.com/api';
     const finalUrl = `${baseUrl.replace(/\/+$/, '')}/auth/forgot-password`;
     console.log('Forgot password API base:', baseUrl);
     console.log('Forgot password endpoint:', finalUrl);
