@@ -85,6 +85,15 @@ app.use('/api/reviews',    require('./routes/reviews'));
 app.use('/api/coupons',    require('./routes/coupons'));
 app.use('/api/admin',      require('./routes/admin'));
 
+// ── Deployment debug route ───────────────────
+app.get('/api/deploy-version', (req, res) => {
+  res.json({
+    success: true,
+    version: 'forgot-password-debug-v2',
+    time: new Date().toISOString(),
+  });
+});
+
 // ── Health Check ──────────────────────────────
 app.get('/', (req, res) => {
   res.json({
