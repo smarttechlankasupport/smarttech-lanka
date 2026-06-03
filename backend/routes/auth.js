@@ -113,7 +113,7 @@ router.post('/forgot-password', asyncH(async (req, res) => {
     }
     return res.status(500).json({
       success: false,
-      message: 'Unable to send reset email. Please check email server configuration.',
+      message: 'Unable to send reset email. Please check Gmail App Password or SMTP configuration.',
     });
   }
 }));
