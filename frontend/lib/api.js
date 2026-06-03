@@ -15,8 +15,11 @@ const DEV_FALLBACK_URL = 'http://localhost:5000/api';
 // 1. Use env var if set (recommended for production)
 // 2. Use production URL as fallback in production
 // 3. Use localhost fallback in development
-const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL 
-  || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? PRODUCTION_API_URL : DEV_FALLBACK_URL);
+const envApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+const isBrowser = typeof window !== 'undefined';
+const clientHost = isBrowser ? window.location.hostname : null;
+const isLocalhost = isBrowser && ['localhost', '127.0.0.1'].includes(clientHost);
+const rawBaseUrl = envApiUrl || ((process.env.NODE_ENV === 'development' || isLocalhost) ? DEV_FALLBACK_URL : PRODUCTION_API_URL);
 const normalizedBaseUrl = rawBaseUrl.replace(/\/+$/, '');
 const BASE_URL = normalizedBaseUrl.endsWith('/api') ? normalizedBaseUrl : `${normalizedBaseUrl}/api`;
 

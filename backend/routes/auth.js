@@ -27,7 +27,8 @@ const sendToken = (user, statusCode, res) => {
 // POST /api/auth/register
 router.post('/register', asyncH(async (req, res) => {
   console.log('REGISTER ROUTE HIT');
-  const { name, email, password, phone } = req.body;
+  const { name, email: rawEmail, password, phone } = req.body;
+  const email = rawEmail?.trim().toLowerCase();
   if (!name || !email || !password) {
     const err = new Error('Please provide name, email and password');
     err.statusCode = 400;
@@ -47,7 +48,8 @@ router.post('/register', asyncH(async (req, res) => {
 // POST /api/auth/login
 router.post('/login', asyncH(async (req, res) => {
   console.log('LOGIN ROUTE HIT');
-  const { email, password } = req.body;
+  const { email: rawEmail, password } = req.body;
+  const email = rawEmail?.trim().toLowerCase();
   if (!email || !password) {
     const err = new Error('Provide email and password');
     err.statusCode = 400;
@@ -75,10 +77,11 @@ router.post('/login', asyncH(async (req, res) => {
 
 // POST /api/auth/forgot-password
 router.post('/forgot-password', asyncH(async (req, res) => {
-  const { email } = req.body;
+  const { email: rawEmail } = req.body;
+  const email = rawEmail?.trim().toLowerCase();
   if (!email) { const err = new Error('Please provide your email address'); err.statusCode = 400; throw err; }
 
-  const user = await User.findOne({ email: email.toLowerCase() });
+  const user = await User.findOne({ email });
   if (!user) {
     return res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
   }

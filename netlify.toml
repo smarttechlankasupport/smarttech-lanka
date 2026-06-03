@@ -2,5 +2,9 @@
   command = "npm run build"
   publish = ".next"
 
+[build.environment]
+  NEXT_PUBLIC_API_URL = "https://smarttech-lanka.onrender.com/api"
+  NEXT_PUBLIC_SITE_URL = "https://smarttech-lanka.netlify.app"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"

@@ -29,15 +29,28 @@ if (process.env.NODE_ENV === 'development') {
   app.use(cors({ origin: true, credentials: true }));
   console.log('CORS: development mode - allowing all origins');
 } else {
-  const allowedOrigins = [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
-    'https://smarttechlanka.lk',
-    'https://www.smarttechlanka.lk',
-    'https://smarttech-lanka.vercel.app',
-  ];
+  const buildAllowedOrigins = () => {
+    const rawOrigins = [
+      process.env.FRONTEND_URL,
+      process.env.FRONTEND_URLS,
+      'https://smarttech-lanka.netlify.app',
+      'https://smarttechlanka.lk',
+      'https://www.smarttechlanka.lk',
+      'https://smarttech-lanka.vercel.app',
+    ];
+    return rawOrigins
+      .filter(Boolean)
+      .flatMap((value) => typeof value === 'string' ? value.split(',') : [value])
+      .map((origin) => origin.trim().replace(/\/+$/, ''))
+      .filter(Boolean);
+  };
+
+  const allowedOrigins = [...new Set(buildAllowedOrigins())];
+  console.log('CORS: allowed origins ->', allowedOrigins);
   app.use(cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      const normalizedOrigin = origin?.replace(/\/+$/, '');
+      if (!origin || allowedOrigins.includes(normalizedOrigin)) {
         return callback(null, true);
       }
       console.warn(`CORS: blocked origin -> ${origin}`);
@@ -61,7 +74,7 @@ console.log('SERVER STARTED - LOADING ROUTES');
 
 // ── API Routes ────────────────────────────────
 const authRouter = require('./routes/auth');
-app.use('/api/auth', authRouter);
+app.use(['/api/auth', '/auth'], authRouter);
 console.log('Auth routes loaded');
 app.use('/api/products',   require('./routes/products'));
 app.use('/api/categories', require('./routes/categories'));
