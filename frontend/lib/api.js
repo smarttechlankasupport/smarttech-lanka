@@ -21,7 +21,7 @@ const clientHost = isBrowser ? window.location.hostname : null;
 const isLocalhost = isBrowser && ['localhost', '127.0.0.1'].includes(clientHost);
 const rawBaseUrl = envApiUrl || ((process.env.NODE_ENV === 'development' || isLocalhost) ? DEV_FALLBACK_URL : PRODUCTION_API_URL);
 const normalizedBaseUrl = rawBaseUrl.replace(/\/+$/, '');
-const BASE_URL = normalizedBaseUrl.endsWith('/api') ? normalizedBaseUrl : `${normalizedBaseUrl}/api`;
+export const BASE_URL = normalizedBaseUrl.endsWith('/api') ? normalizedBaseUrl : `${normalizedBaseUrl}/api`;
 
 // ── Axios instance ────────────────────────────
 const api = axios.create({

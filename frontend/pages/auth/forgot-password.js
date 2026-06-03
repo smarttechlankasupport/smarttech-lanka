@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { NextSeo } from 'next-seo';
 import { FiMail, FiZap } from 'react-icons/fi';
 import toast from 'react-hot-toast';
-import { authAPI } from '../../lib/api';
+import { authAPI, BASE_URL } from '../../lib/api';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -13,13 +13,23 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     if (!email.trim()) { toast.error('Enter your email address'); return; }
     setSending(true);
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.trim() || BASE_URL || 'https://smarttech-lanka.onrender.com/api';
+    const finalUrl = `${baseUrl.replace(/\/+$/, '')}/auth/forgot-password`;
+    console.log('Forgot password API base:', baseUrl);
+    console.log('Forgot password endpoint:', finalUrl);
     try {
       const res = await authAPI.forgotPassword({ email });
       toast.success(res.data.message || 'Reset link sent if the email exists.');
       setEmail('');
     } catch (err) {
-      console.error('[forgot-password] request failed', err);
-      const message = err?.response?.data?.message || err?.message || 'Network error. Please try again.';
+      console.error('Forgot password error:', {
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+        url: err.config?.url,
+        baseURL: err.config?.baseURL,
+      });
+      const message = err?.response?.data?.message || err?.message || 'Failed to send reset email';
       toast.error(message);
     } finally {
       setSending(false);

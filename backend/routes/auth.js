@@ -77,23 +77,27 @@ router.post('/login', asyncH(async (req, res) => {
 
 // POST /api/auth/forgot-password
 router.post('/forgot-password', asyncH(async (req, res) => {
-  const { email: rawEmail } = req.body;
-  const email = rawEmail?.trim().toLowerCase();
-  if (!email) { const err = new Error('Please provide your email address'); err.statusCode = 400; throw err; }
-
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
-  }
-
-  const resetToken = user.generatePasswordReset();
-  await user.save({ validateBeforeSave: false });
-
-  const frontendBase = (process.env.FRONTEND_URL || 'https://smarttech-lanka.netlify.app').replace(/\/+$|\s+/g, '');
-  const resetUrl = `${frontendBase}/auth/reset-password/${resetToken}`;
-  const message = `You requested a password reset for your Smart  Tech account. Click the link below to set a new password.\n\n${resetUrl}\n\nIf you did not request this, ignore this email.`;
-
+  console.log('[forgot-password] request received:', req.body.email);
   try {
+    const { email: rawEmail } = req.body;
+    const email = rawEmail?.trim().toLowerCase();
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Please provide your email address' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
+    }
+
+    const resetToken = user.generatePasswordReset();
+    await user.save({ validateBeforeSave: false });
+
+    const frontendBase = (process.env.FRONTEND_URL || 'https://smarttech-lanka.netlify.app').replace(/\/+$|\s+/g, '');
+    const resetUrl = `${frontendBase}/auth/reset-password/${resetToken}`;
+    console.log('[forgot-password] reset URL generated:', resetUrl);
+    const message = `You requested a password reset for your Smart  Tech account. Click the link below to set a new password.\n\n${resetUrl}\n\nIf you did not request this, ignore this email.`;
+
     await sendEmail({
       to: user.email,
       subject: 'Smart  Tech Password Reset',
@@ -101,34 +105,23 @@ router.post('/forgot-password', asyncH(async (req, res) => {
       html: `<p>Hello ${user.name || 'Customer'},</p><p>You requested a password reset for your Smart  Tech account. Click the button below to set a new password.</p><p><a href="${resetUrl}" style="display:inline-block;padding:12px 20px;background:#000;color:#fff;border-radius:12px;text-decoration:none;">Reset Password</a></p><p>If you did not request this, ignore this email.</p>`,
     });
 
-    res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
-  } catch (err) {
-    console.error('EMAIL CONFIG:', {
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      userExists: !!process.env.EMAIL_USER,
-      from: process.env.EMAIL_FROM,
-    });
-    console.error('EMAIL SEND FAILED:', err);
-
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-    await user.save({ validateBeforeSave: false });
-
-    const errorPayload = {
-      message: err.message,
-      code: err.code,
-      response: err.response,
-      stack: err.stack,
-    };
-
+    return res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
+  } catch (error) {
+    console.error('[forgot-password] error:', error);
+    if (error.message?.includes('Email configuration is incomplete')) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
     return res.status(500).json({
       success: false,
-      message: 'Unable to send reset email. Please try again later.',
-      error: errorPayload,
+      message: 'Unable to send reset email. Please check email server configuration.',
     });
   }
 }));
+
+// GET /api/auth/forgot-password-test
+router.get('/forgot-password-test', (req, res) => {
+  res.json({ success: true, message: 'Forgot password route reachable' });
+});
 
 // POST /api/auth/reset-password
 router.post('/reset-password', asyncH(async (req, res) => {

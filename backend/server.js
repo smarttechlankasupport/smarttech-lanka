@@ -24,41 +24,41 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // ── CORS ────────────────────────────────────
-// For development, allow all origins to simplify local debugging (cookies still allowed).
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'https://smarttech-lanka.netlify.app',
+  'https://smarttech-lanka.netlify.app',
+  'http://localhost:3000',
+  'http://localhost:5173',
+];
+
+const corsOptions = process.env.NODE_ENV === 'development'
+  ? {
+      origin: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+    }
+  : {
+      origin: (origin, callback) => {
+        const normalizedOrigin = origin?.replace(/\/+$/, '');
+        if (!origin || allowedOrigins.includes(normalizedOrigin)) {
+          return callback(null, true);
+        }
+        console.warn(`CORS: blocked origin -> ${origin}`);
+        return callback(new Error('Not allowed by CORS'));
+      },
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+    };
+
 if (process.env.NODE_ENV === 'development') {
-  app.use(cors({ origin: true, credentials: true }));
   console.log('CORS: development mode - allowing all origins');
 } else {
-  const buildAllowedOrigins = () => {
-    const rawOrigins = [
-      process.env.FRONTEND_URL,
-      process.env.FRONTEND_URLS,
-      'https://smarttech-lanka.netlify.app',
-      'https://smarttechlanka.lk',
-      'https://www.smarttechlanka.lk',
-      'https://smarttech-lanka.vercel.app',
-    ];
-    return rawOrigins
-      .filter(Boolean)
-      .flatMap((value) => typeof value === 'string' ? value.split(',') : [value])
-      .map((origin) => origin.trim().replace(/\/+$/, ''))
-      .filter(Boolean);
-  };
-
-  const allowedOrigins = [...new Set(buildAllowedOrigins())];
   console.log('CORS: allowed origins ->', allowedOrigins);
-  app.use(cors({
-    origin: (origin, callback) => {
-      const normalizedOrigin = origin?.replace(/\/+$/, '');
-      if (!origin || allowedOrigins.includes(normalizedOrigin)) {
-        return callback(null, true);
-      }
-      console.warn(`CORS: blocked origin -> ${origin}`);
-      return callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true,
-  }));
 }
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // ── Body Parsing ─────────────────────────────
 app.use(express.json({ limit: '10mb' }));
