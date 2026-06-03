@@ -95,6 +95,48 @@ app.get('/', (req, res) => {
   });
 });
 
+// ── List All Registered Routes ─────────────────
+const listRoutes = () => {
+  const routes = [];
+  const extractRoutes = (stack, prefix = '') => {
+    stack.forEach(layer => {
+      if (layer.route) {
+        const methods = Object.keys(layer.route.methods).map(m => m.toUpperCase()).join(', ');
+        const fullPath = prefix + layer.route.path;
+        routes.push({ path: fullPath, method: methods });
+      } else if (layer.name === 'router' && layer.handle.stack) {
+        // Extract clean prefix from regex pattern
+        let routePrefix = '';
+        if (layer.regexp) {
+          const source = layer.regexp.source;
+          // Handle patterns like ^\\/api\\/auth or ^/api/auth
+          const match = source.match(/^\^(.*)\?/);
+          if (match) {
+            routePrefix = match[1].replace(/\\\//g, '/').replace(/\\/g, '');
+          }
+        }
+        extractRoutes(layer.handle.stack, prefix + routePrefix);
+      }
+    });
+  };
+  extractRoutes(app._router.stack);
+  console.log('\n📍 Registered Routes:');
+  routes
+    .filter(r => r.path !== '/' && !r.path.includes('*'))
+    .sort((a, b) => a.path.localeCompare(b.path))
+    .forEach(r => console.log(`   ${r.method.padEnd(6)} ${r.path}`));
+  console.log('\n✅ Auth Routes Check:');
+  const authRoutes = routes.filter(r => r.path.includes('/auth'));
+  ['login', 'register', 'forgot-password', 'reset-password'].forEach(route => {
+    const exists = authRoutes.some(r => r.path.includes(route));
+    console.log(`   ${exists ? '✓' : '✗'} POST /api/auth/${route}`);
+  });
+  console.log('');
+
+
+};
+listRoutes();
+
 // ── 404 Handler ───────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
