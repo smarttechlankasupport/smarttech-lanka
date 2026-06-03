@@ -108,12 +108,12 @@ router.post('/forgot-password', asyncH(async (req, res) => {
     return res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
   } catch (error) {
     console.error('[forgot-password] error:', error);
-    if (error.message?.includes('Email configuration is incomplete')) {
+    if (error.message?.includes('RESEND_API_KEY')) {
       return res.status(500).json({ success: false, message: error.message });
     }
     return res.status(500).json({
       success: false,
-      message: 'Unable to send reset email. Please check Gmail App Password or SMTP configuration.',
+      message: 'Unable to send reset email. Please check Resend email configuration.',
     });
   }
 }));

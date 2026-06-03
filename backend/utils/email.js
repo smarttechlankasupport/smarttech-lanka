@@ -1,80 +1,37 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const createTransporter = () => {
-  const host = process.env.EMAIL_HOST || 'smtp.gmail.com';
-  const port = Number(process.env.EMAIL_PORT) || 587;
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
-  const from = process.env.EMAIL_FROM || process.env.EMAIL_USER;
-  const isGmail = host?.includes('gmail.com');
+if (!process.env.RESEND_API_KEY) {
+  throw new Error('RESEND_API_KEY is required for email sending. Set it in your environment.');
+}
 
-  console.log('SMTP CONFIG:', {
-    host,
-    port,
-    userExists: !!user,
-    passExists: !!pass,
-    isGmail,
-    from,
-  });
-
-  if (!user || !pass) {
-    throw new Error('Email configuration is incomplete. Please set EMAIL_USER and EMAIL_PASS in .env');
-  }
-
-  if (isGmail && pass && pass.length < 16) {
-    console.warn('Gmail SMTP detected. EMAIL_PASS should be a Gmail App Password, not a normal mailbox password.');
-  }
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: false,
-    auth: { user, pass },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
-  });
-};
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html, text }) => {
-  const transporter = createTransporter();
-  const from = process.env.EMAIL_FROM || process.env.EMAIL_USER;
-  console.log('[email] verifying SMTP connection...');
+  const from = process.env.EMAIL_FROM || 'Smart Tech <onboarding@resend.dev>';
+  console.log('[email] sending via Resend...', { to, subject, from });
+
   try {
-    await transporter.verify();
-    console.log('[email] SMTP verified successfully');
-  } catch (error) {
-    console.error('[email] failed:', {
-      code: error.code,
-      command: error.command,
-      response: error.response,
-      responseCode: error.responseCode,
-      message: error.message,
+    const response = await resend.emails.send({
+      from,
+      to,
+      subject,
+      html,
+      text,
     });
-    throw error;
-  }
 
-  console.log('SEND EMAIL:', { to, subject, from });
-  const sendPromise = transporter.sendMail({
-    from,
-    to,
-    subject,
-    html,
-    text,
-  });
-
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('Email send timed out')), 20000);
-  });
-
-  try {
-    await Promise.race([sendPromise, timeoutPromise]);
+    console.log('[email] sent successfully', {
+      id: response.id,
+      status: response.status,
+      to: response.to,
+      message: response?.message || 'Sent',
+    });
+    return response;
   } catch (error) {
     console.error('[email] failed:', {
       code: error.code,
-      command: error.command,
+      type: error.type,
+      status: error.status,
       response: error.response,
-      responseCode: error.responseCode,
       message: error.message,
     });
     throw error;
