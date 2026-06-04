@@ -119,6 +119,15 @@ export const categoryAPI = {
   delete:   (id)      => api.delete(`/categories/${id}`).catch(handleErr),
 };
 
+// ── SERVICES ──────────────────────────────
+export const serviceAPI = {
+  getAll:   ()        => api.get('/services').catch(handleErr),
+  getById:  (id)      => api.get(`/services/${id}`).catch(handleErr),
+  create:   (data)    => api.post('/services', data).catch(handleErr),
+  update:   (id, d)   => api.put(`/services/${id}`, d).catch(handleErr),
+  delete:   (id)      => api.delete(`/services/${id}`).catch(handleErr),
+};
+
 // ── ORDERS ───────────────────────────────────
 export const orderAPI = {
   create:       (data)       => api.post('/orders',              data).catch(handleErr),

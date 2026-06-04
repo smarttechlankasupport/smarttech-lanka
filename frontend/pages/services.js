@@ -3,31 +3,22 @@
    Purpose: Service booking page — choose
             service, pick date/time, submit form
    ============================================ */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NextSeo } from 'next-seo';
 import { FiCheck, FiCalendar, FiClock, FiMapPin, FiPhone, FiUser, FiMail, FiMessageSquare } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import Layout from '../components/layout/Layout';
-import { bookingAPI } from '../lib/api';
+import { bookingAPI, serviceAPI } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { SERVICE_TYPES, TIME_SLOTS, SL_DISTRICTS } from '../lib/utils';
-
-const SERVICES_INFO = [
-  { name: 'Smart Home Setup',    icon: '🏠', price: 'From Rs. 15,000', duration: '1–2 days',   color: '#f8f8f8' },
-  { name: 'CCTV Installation',   icon: '📷', price: 'From Rs. 5,000',  duration: '4–8 hours',  color: '#f8f8f8' },
-  { name: 'Smart Lighting',      icon: '💡', price: 'From Rs. 3,000',  duration: '2–4 hours',  color: '#f8f8f8' },
-  { name: 'Smart Lock Install',  icon: '🔒', price: 'From Rs. 2,500',  duration: '1–2 hours',  color: '#f8f8f8' },
-  { name: 'Home Automation',     icon: '🤖', price: 'From Rs. 20,000', duration: '2–5 days',   color: '#f8f8f8' },
-  { name: 'Electrical Repair',   icon: '⚡', price: 'From Rs. 1,500',  duration: '1–3 hours',  color: '#f8f8f8' },
-  { name: 'Security System',     icon: '🛡️', price: 'From Rs. 8,000',  duration: '1–2 days',   color: '#f8f8f8' },
-  { name: 'Consultation',        icon: '📋', price: 'FREE',            duration: '30–60 mins', color: '#f8f8f8' },
-];
 
 const tomorrow = () => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; };
 
 export default function ServicesPage() {
   const { user } = useAuth();
+  const [services, setServices] = useState([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
   const [submitted, setSubmitted] = useState(false);
   const [loading,   setLoading]   = useState(false);
   const [bookingRef, setBookingRef] = useState('');
@@ -45,6 +36,24 @@ export default function ServicesPage() {
     priority: 'normal',
   });
   const upd = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
+
+  // Fetch services from database
+  useEffect(() => {
+    const fetchServices = async () => {
+      setServicesLoading(true);
+      try {
+        const res = await serviceAPI.getAll();
+        setServices(res.data.services || []);
+      } catch (err) {
+        console.error('Failed to fetch services:', err);
+        toast.error('Failed to load services');
+        setServices([]);
+      } finally {
+        setServicesLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,6 +99,30 @@ export default function ServicesPage() {
     </Layout>
   );
 
+  if (submitted) return (
+    <Layout>
+      <div className="min-h-[70vh] flex items-center justify-center px-4">
+        <div className="glass max-w-md w-full p-10 rounded-2xl text-center">
+          <div className="w-20 h-20 rounded-full bg-green-400/15 border-2 border-green-400/40 flex items-center justify-center mx-auto mb-6">
+            <FiCheck className="text-green-400 text-3xl" />
+          </div>
+          <h2 className="font-orbitron font-bold text-2xl text-white mb-2">Booking Confirmed! 🎉</h2>
+          <p className="font-bold text-white font-orbitron text-lg mb-4">{bookingRef}</p>
+          <p className="text-gray-400 text-sm leading-relaxed mb-8">
+            Thank you! Our team will contact you within <strong className="text-white">2 hours</strong> to confirm your <strong className="text-white">{form.service}</strong> appointment on <strong className="text-white">{form.date}</strong>.
+          </p>
+          <div className="flex gap-3">
+            <button onClick={() => { setSubmitted(false); setForm(p => ({ ...p, service: '', notes: '', date: tomorrow() })); }}
+              className="btn-outline flex-1 py-3 text-sm justify-center">Book Another</button>
+            <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-whatsapp flex-1 py-3 text-sm justify-center flex items-center gap-2">
+              <FaWhatsapp /> WhatsApp Us
+            </a>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+
   return (
     <Layout>
       <NextSeo title="Book a Service" description="Book smart home installation, CCTV setup, electrical repairs & more across Sri Lanka." />
@@ -106,18 +139,34 @@ export default function ServicesPage() {
       <div className="page-container py-12">
         {/* Service cards */}
         <h2 className="font-bold text-white text-lg mb-5">Our Services</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-12">
-          {SERVICES_INFO.map(s => (
-            <button key={s.name} onClick={() => setForm(p => ({ ...p, service: s.name }))}
-              className={`p-4 rounded-xl text-left transition-all border-2 ${
-                form.service === s.name ? 'border-white/10 bg-white/10' : 'border-white/5 card hover:border-white/15'}`}>
-              <div className="text-2xl mb-2">{s.icon}</div>
-              <p className="text-xs font-bold text-white leading-snug mb-1">{s.name}</p>
-              <p className="text-[10px] font-semibold text-white">{s.price}</p>
-              <p className="text-[10px] text-gray-600">{s.duration}</p>
-            </button>
-          ))}
-        </div>
+        {servicesLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-12">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/10 animate-pulse">
+                <div className="text-2xl mb-2">⏳</div>
+                <div className="h-3 bg-white/10 rounded mb-2 w-2/3" />
+                <div className="h-2 bg-white/10 rounded w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : services.length === 0 ? (
+          <div className="card p-8 rounded-xl text-center mb-12">
+            <p className="text-gray-400">No services available right now.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-12">
+            {services.map(s => (
+              <button key={s._id} onClick={() => setForm(p => ({ ...p, service: s.title }))}
+                className={`p-4 rounded-xl text-left transition-all border-2 ${
+                  form.service === s.title ? 'border-white/10 bg-white/10' : 'border-white/5 card hover:border-white/15'}`}>
+                <div className="text-2xl mb-2">{s.icon}</div>
+                <p className="text-xs font-bold text-white leading-snug mb-1">{s.title}</p>
+                <p className="text-[10px] font-semibold text-white">{s.priceLabel || (s.price ? `Rs. ${s.price.toLocaleString()}` : '—')}</p>
+                <p className="text-[10px] text-gray-600">{s.duration || '—'}</p>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Booking form */}
         <div className="grid lg:grid-cols-3 gap-8">
@@ -144,7 +193,7 @@ export default function ServicesPage() {
                   <label className="input-label">Service Type *</label>
                   <select className="input" value={form.service} onChange={upd('service')} required>
                     <option value="">Select service</option>
-                    {SERVICE_TYPES.map(s => <option key={s} value={s}>{s}</option>)}
+                    {services.map(s => <option key={s._id} value={s.title}>{s.title}</option>)}
                   </select>
                 </div>
 

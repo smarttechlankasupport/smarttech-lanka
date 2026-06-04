@@ -86,6 +86,7 @@ app.use(['/api/auth', '/auth'], authRouter);
 console.log('Auth routes loaded');
 app.use('/api/products',   require('./routes/products'));
 app.use('/api/categories', require('./routes/categories'));
+app.use('/api/services',   require('./routes/services'));
 app.use('/api/orders',     require('./routes/orders'));
 app.use('/api/bookings',   require('./routes/bookings'));
 app.use('/api/users',      require('./routes/users'));
@@ -188,6 +189,10 @@ let server;
 
 const startServer = async () => {
   await connectDB();
+
+  // Seed services if none exist
+  const seedServices = require('./utils/seedServices');
+  await seedServices();
 
   server = app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
