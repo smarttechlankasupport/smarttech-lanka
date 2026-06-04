@@ -74,8 +74,8 @@ export default function HomePage({ featured, categories }) {
           {/* Headline */}
           <h1 className="font-orbitron font-black text-white mb-4 leading-tight"
             style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)' }}>
-            Smart Living<br />
-            <span className="glow-text">Made Easy</span>
+            Powering the Future<br />
+            <span className="glow-text">with Smart Technology</span>
           </h1>
 
           <p className="text-gray-400 max-w-xl mx-auto mb-10 leading-relaxed"
