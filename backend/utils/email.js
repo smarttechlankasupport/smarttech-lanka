@@ -8,11 +8,13 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html, text }) => {
   const from = process.env.EMAIL_FROM || 'Smart Tech <support@smarttech-lanka.com>';
-  console.log('[email] sending via Resend...', { to, subject, from });
+  const replyTo = process.env.EMAIL_REPLY_TO || process.env.EMAIL_USER || 'smarttechlanka.support@gmail.com';
+  console.log('[email] sending via Resend...', { to, subject, from, replyTo });
 
   try {
     const response = await resend.emails.send({
       from,
+      replyTo,
       to,
       subject,
       html,
