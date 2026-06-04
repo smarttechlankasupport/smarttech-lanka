@@ -10,8 +10,8 @@ import { CartProvider } from '../context/CartContext';
 import { DefaultSeo } from 'next-seo';
 
 const SEO_CONFIG = {
-  titleTemplate:   '%s | Smart  Tech',
-  defaultTitle:    'Smart  Tech — Smart Tech, Smart Life',
+  titleTemplate:   '%s | Smart Tech Lanka',
+  defaultTitle:    'Smart Tech Lanka',
   description:     "Sri Lanka's #1 smart home solutions provider. Shop smart lights, CCTV, locks, automation & more.",
   canonical:       process.env.NEXT_PUBLIC_SITE_URL,
   openGraph: {

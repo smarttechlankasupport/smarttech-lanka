@@ -12,7 +12,7 @@ export default function Document() {
         <meta charSet="UTF-8" />
         <meta name="theme-color" content="#020810" />
         <meta name="color-scheme" content="dark" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         {/* Preconnect for fonts */}
