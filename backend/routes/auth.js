@@ -93,8 +93,8 @@ router.post('/forgot-password', asyncH(async (req, res) => {
     const resetToken = user.generatePasswordReset();
     await user.save({ validateBeforeSave: false });
 
-    const frontendBase = (process.env.FRONTEND_URL || 'https://smarttech-lanka.netlify.app').replace(/\/+$|\s+/g, '');
-    const resetUrl = `${frontendBase}/auth/reset-password/${resetToken}`;
+    const frontendUrl = (process.env.FRONTEND_URL || 'https://smarttech-lanka.com').replace(/\/$/, '');
+    const resetUrl = `${frontendUrl}/auth/reset-password/${resetToken}`;
     console.log('[forgot-password] reset URL generated:', resetUrl);
     const message = `You requested a password reset for your Smart  Tech account. Click the link below to set a new password.\n\n${resetUrl}\n\nIf you did not request this, ignore this email.`;
 

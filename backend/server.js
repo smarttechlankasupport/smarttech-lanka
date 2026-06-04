@@ -15,6 +15,9 @@ const app = express();
 // ── Trust Proxy (for production on Render) ──
 app.set('trust proxy', 1);
 
+console.log('[config] FRONTEND_URL:', process.env.FRONTEND_URL);
+console.log('[config] EMAIL_FROM:', process.env.EMAIL_FROM);
+
 // ── Security Middleware ──────────────────────
 app.use(helmet());
 
@@ -27,9 +30,9 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // ── CORS ────────────────────────────────────
+const frontendUrl = (process.env.FRONTEND_URL || 'https://smarttech-lanka.com').replace(/\/$/, '');
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'https://smarttech-lanka.netlify.app',
-  'https://smarttech-lanka.netlify.app',
+  frontendUrl,
   'https://smarttech-lanka.com',
   'https://www.smarttech-lanka.com',
   'http://localhost:3000',

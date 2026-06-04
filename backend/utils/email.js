@@ -7,7 +7,7 @@ if (!process.env.RESEND_API_KEY) {
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html, text }) => {
-  const from = process.env.EMAIL_FROM || 'Smart Tech <onboarding@resend.dev>';
+  const from = process.env.EMAIL_FROM || 'Smart Tech <support@smarttech-lanka.com>';
   console.log('[email] sending via Resend...', { to, subject, from });
 
   try {
