@@ -5,23 +5,8 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-// Production API URL (always available)
-const PRODUCTION_API_URL = 'https://smarttech-lanka-api.onrender.com/api';
-
-// Development fallback (localhost)
-const DEV_FALLBACK_URL = 'http://localhost:5000/api';
-
-// Determine base URL:
-// 1. Use env var if set (recommended for production)
-// 2. Use production URL as fallback in production
-// 3. Use localhost fallback in development
-const envApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
-const isBrowser = typeof window !== 'undefined';
-const clientHost = isBrowser ? window.location.hostname : null;
-const isLocalhost = isBrowser && ['localhost', '127.0.0.1'].includes(clientHost);
-const rawBaseUrl = envApiUrl || ((process.env.NODE_ENV === 'development' || isLocalhost) ? DEV_FALLBACK_URL : PRODUCTION_API_URL);
-const normalizedBaseUrl = rawBaseUrl.replace(/\/+$/, '');
-export const BASE_URL = normalizedBaseUrl.endsWith('/api') ? normalizedBaseUrl : `${normalizedBaseUrl}/api`;
+// Base URL: use explicit env var if set, otherwise production API
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smarttech-lanka.onrender.com/api';
 
 // ── Axios instance ────────────────────────────
 const api = axios.create({
@@ -68,7 +53,7 @@ api.interceptors.response.use(
 // ── Helper ──────────────────────────────────
 const handleErr = (err) => {
   if (!err.response) {
-    throw new Error(`Network Error. Ensure the backend is running and reachable at ${BASE_URL}`);
+    throw new Error('Network Error. Ensure the backend is reachable at https://smarttech-lanka.onrender.com/api');
   }
 
   const apiMessage = err.response?.data?.message || err.response?.statusText;

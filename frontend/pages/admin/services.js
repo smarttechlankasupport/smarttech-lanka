@@ -50,7 +50,14 @@ export default function AdminServices() {
       // For admin, get all services including inactive ones
       // This would require a separate admin endpoint, but for now use the public one
       setServices(res.data.services || []);
-    } catch {
+    } catch (err) {
+      console.error('Failed request:', {
+        url: err.config?.url,
+        baseURL: err.config?.baseURL,
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+      });
       toast.error('Failed to load services');
     } finally {
       setLoading(false);

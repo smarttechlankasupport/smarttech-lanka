@@ -50,7 +50,16 @@ export default function AdminBookings() {
       const res = await bookingAPI.getAll({ page, limit: 20, status: statusFilter });
       setBookings(res.data.bookings || []);
       setTotal(res.data.total || 0);
-    } catch { toast.error('Failed to load bookings'); }
+    } catch (err) {
+      console.error('Failed request:', {
+        url: err.config?.url,
+        baseURL: err.config?.baseURL,
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+      });
+      toast.error('Failed to load bookings');
+    }
     finally { setLoading(false); }
   };
 

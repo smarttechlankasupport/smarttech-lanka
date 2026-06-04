@@ -45,7 +45,16 @@ export default function AdminCoupons() {
     try {
       const res = await couponAPI.getAll();
       setCoupons(res.data.coupons || []);
-    } catch { toast.error('Failed to load coupons'); }
+    } catch (err) {
+      console.error('Failed request:', {
+        url: err.config?.url,
+        baseURL: err.config?.baseURL,
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+      });
+      toast.error('Failed to load coupons');
+    }
     finally { setLoading(false); }
   };
 

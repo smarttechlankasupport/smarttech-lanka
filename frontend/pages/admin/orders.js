@@ -41,7 +41,16 @@ export default function AdminOrders() {
       setOrders(res.data.orders || []);
       setTotal(res.data.total  || 0);
       setPages(res.data.pages  || 1);
-    } catch { toast.error('Failed to load orders'); }
+    } catch (err) {
+      console.error('Failed request:', {
+        url: err.config?.url,
+        baseURL: err.config?.baseURL,
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+      });
+      toast.error('Failed to load orders');
+    }
     finally { setLoading(false); }
   };
 

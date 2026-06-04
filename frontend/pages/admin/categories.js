@@ -41,7 +41,16 @@ export default function AdminCategories() {
     try {
       const res = await categoryAPI.getAll();
       setCats(res.data.categories || []);
-    } catch { toast.error('Failed to load categories'); }
+    } catch (err) {
+      console.error('Failed request:', {
+        url: err.config?.url,
+        baseURL: err.config?.baseURL,
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+      });
+      toast.error('Failed to load categories');
+    }
     finally { setLoading(false); }
   };
 
