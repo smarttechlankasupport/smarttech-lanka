@@ -32,7 +32,15 @@ const STATS = [
 
 export default function HomePage({ featured, categories }) {
   const waLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '94717336524'}`;
+  const shopLocationUrl =
+    process.env.NEXT_PUBLIC_SHOP_LOCATION_URL ||
+    'https://www.google.com/maps/search/?api=1&query=Smart+Tech+Lanka';
   const [count, setCount] = useState({ customers: 0, projects: 0 });
+
+  // Debug shop location URL in browser console
+  useEffect(() => {
+    console.log('Shop Location URL:', shopLocationUrl);
+  }, [shopLocationUrl]);
 
   // Count-up animation
   useEffect(() => {
@@ -83,7 +91,7 @@ export default function HomePage({ featured, categories }) {
             <Link href="/shop" className="btn-primary px-8 py-3.5 text-base gap-2">
               <FiZap /> Shop Products
             </Link>
-            <a href={process.env.NEXT_PUBLIC_SHOP_LOCATION_URL || "https://www.google.com/maps/search/?api=1&query=Smart+Tech+Lanka"} target="_blank" rel="noopener noreferrer" className="btn-outline px-8 py-3.5 text-base gap-2">
+            <a href={shopLocationUrl} target="_blank" rel="noopener noreferrer" className="btn-outline px-8 py-3.5 text-base gap-2">
               <FiMapPin /> Track Shop Location
             </a>
             <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-whatsapp px-8 py-3.5 text-base gap-2">
