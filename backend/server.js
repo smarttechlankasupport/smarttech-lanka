@@ -12,6 +12,9 @@ const connectDB = require('./config/db');
 
 const app = express();
 
+// ── Trust Proxy (for production on Render) ──
+app.set('trust proxy', 1);
+
 // ── Security Middleware ──────────────────────
 app.use(helmet());
 
@@ -27,6 +30,8 @@ app.use('/api/', limiter);
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'https://smarttech-lanka.netlify.app',
   'https://smarttech-lanka.netlify.app',
+  'https://smarttech-lanka.com',
+  'https://www.smarttech-lanka.com',
   'http://localhost:3000',
   'http://localhost:5173',
 ];
