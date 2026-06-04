@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { NextSeo } from 'next-seo';
-import { FiArrowRight, FiZap, FiShield, FiWifi, FiPhone, FiTool, FiStar } from 'react-icons/fi';
+import { FiArrowRight, FiZap, FiShield, FiWifi, FiPhone, FiTool, FiStar, FiMapPin } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import Layout from '../components/layout/Layout';
 import ProductCard from '../components/ui/ProductCard';
@@ -77,12 +77,15 @@ export default function HomePage({ featured, categories }) {
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
-            <Link href="/shop" className="btn-primary px-8 py-3.5 text-base gap-2">
-              <FiZap /> Shop Products
-            </Link>
             <Link href="/services" className="btn-outline px-8 py-3.5 text-base gap-2">
               <FiTool /> Book Service
             </Link>
+            <Link href="/shop" className="btn-primary px-8 py-3.5 text-base gap-2">
+              <FiZap /> Shop Products
+            </Link>
+            <a href={process.env.NEXT_PUBLIC_SHOP_LOCATION_URL || "https://www.google.com/maps/search/?api=1&query=Smart+Tech+Lanka"} target="_blank" rel="noopener noreferrer" className="btn-outline px-8 py-3.5 text-base gap-2">
+              <FiMapPin /> Track Shop Location
+            </a>
             <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-whatsapp px-8 py-3.5 text-base gap-2">
               <FaWhatsapp className="text-lg" /> WhatsApp
             </a>
